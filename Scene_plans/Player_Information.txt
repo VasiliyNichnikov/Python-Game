@@ -1,0 +1,5 @@
+Level 1
+Last_Open_Level 1
+
+Stars_Level_1 0
+Stars_Level_2 0
