@@ -72,7 +72,7 @@ def ChangeButton(direction=False):
                 listButtonsMenu[btn]["active"] = "select"
 
 
-FPS = 30
+FPS = 60
 clock = pygame.time.Clock()
 running = True
 while running:

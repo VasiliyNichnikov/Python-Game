@@ -1,11 +1,12 @@
 import os
 import pygame
-from Scripts.LoadImages import WorkWithImage
+from Scripts.Level_N import Level
 
 
 class ControllerPlayer(pygame.sprite.Sprite):
-    def __init__(self, group, directory):
+    def __init__(self, group, directory, parent):
         super().__init__(group)
+        self.parent = parent
         # Переменные игрока
         self.posPlayerX = 20
         self.posPlayerY = 265
@@ -14,6 +15,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.isJump = False  # Проверка, что игрок прыгает
         self.isGround = True  # Проверка, что игрок на земле
         self.isMove = False  # Проверка, что игрок двигается
+        self.isDoor = False  # Проверка, что игрок около двери
         self.jumpCount = 11
         self.dictInfoPlayer = {}
         # Прыжлк вверх
@@ -43,7 +45,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         return listRes
 
     # обноление кадров
-    def update(self, group, parent):
+    def update(self, group):
         if self.cur_frame + 1 >= 60:
             self.cur_frame = 0
         if not self.isJump and self.isGround and self.isMove:
@@ -55,10 +57,10 @@ class ControllerPlayer(pygame.sprite.Sprite):
         else:
             self.image = self.idlePlayer[self.cur_frame // 6]
         self.cur_frame += 1
-        self.MovePlayer(parent)
+        self.MovePlayer()
 
     # Движение игрока
-    def MovePlayer(self, parent):
+    def MovePlayer(self):
         # Проверка нажатий на кнопки
         keys = pygame.key.get_pressed()
         #  print(self.posPlayerX)
@@ -68,13 +70,16 @@ class ControllerPlayer(pygame.sprite.Sprite):
         elif keys[pygame.K_a] and self.posPlayerX >= 10:
             self.posPlayerX -= self.speedPlayer
             self.isMove = True
+        elif keys[pygame.K_RETURN] and self.isDoor:
+            print(self.parent.infoDoorToPlayer)
+            level_N = Level(self)
         else:
             self.isMove = False
         self.rect.x = self.posPlayerX
         if self.rect.y >= 800:
             self.MoveToStart([20, 265])
         if not self.isJump:
-            if self.CheckGravity(parent.listAllSpritesGrass)[0] is False:
+            if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrass)[0] is False:
                 self.rect.y -= self.gravity
             else:
                 self.isGround = True
@@ -90,8 +95,11 @@ class ControllerPlayer(pygame.sprite.Sprite):
                 self.jumpCount = 11
             self.jumpCount -= 1
 
-        if self.Doors(parent.dictInfoDoor):
+        if self.Doors(self.parent.dictInfoDoor):
+            self.isDoor = True
             print("Можно войти")
+        else:
+            self.isDoor = False
 
     # Перемещение на старт
     def MoveToStart(self, start):
@@ -110,6 +118,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
                     return True, blockTwo.rect.y
         return False, 0
 
+    # Проверка на то, что игрок около двери
     def Doors(self, allBlocksDoors):
         listBlocks = []
         for i in allBlocksDoors:
@@ -127,12 +136,18 @@ class ControllerPlayer(pygame.sprite.Sprite):
     def CheckLevel(self, sprite, allBlocksDoors):
         for i in allBlocksDoors:
             if allBlocksDoors[i]['sprite'] == sprite:
+                self.parent.infoDoorToPlayer = allBlocksDoors[i]
                 return allBlocksDoors[i]['level']
         return "error"
 
+    # Загружаем информацию об игроке
     def InformationPlayer(self):
         with open("../Scene_plans/Player_Information.txt") as fileInformation:
             fileInformationRead = fileInformation.readlines()
             for info in fileInformationRead:
                 if info.split():
                     self.dictInfoPlayer[info.split()[0]] = info.split()[-1]
+
+    # Рисование помощи
+    def DrawDoor(self):
+        pass
