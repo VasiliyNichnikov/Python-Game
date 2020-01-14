@@ -11,9 +11,9 @@ class Level:
 
     def __init__(self):
         #self.player = player
-        self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, False)
+        self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, False, (1280 // 2, 265))
         self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/Levels/Level_1.txt")
-        self.camera = Camera(1280, 720)
+        self.camera = Camera(self.player)
         #self.player = player
         self.MainFunction()
 
@@ -33,6 +33,9 @@ class Level:
         self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_1.png", (width, height), way="../data/Levels",
                                       colorkey=-1)
 
+        for sprite in self.classLoadScene.spritesTitles:
+            self.camera.StartPos(sprite, self.player, 1000, width // 2)
+
         FPS = 60
         clock = pygame.time.Clock()
         running = True
@@ -40,10 +43,11 @@ class Level:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            # if self.player.rect.x > 615:
-            #     self.camera.update(self.player)
-            #     for sprite in self.classLoadScene.spritesTitles:
-            #         self.camera.apply(sprite)
+
+            #self.camera.update(self.player)
+            #if self.player.isMove:
+            for sprite in self.classLoadScene.spritesTitles:
+                self.camera.apply(sprite)
             # Рисование Titles (Начало)
             spritesBackgroundMenuGroup.draw(screen)
             self.classLoadScene.spritesTitles.draw(screen)

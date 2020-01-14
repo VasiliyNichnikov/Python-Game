@@ -3,18 +3,19 @@ import pygame
 
 
 class ControllerPlayer(pygame.sprite.Sprite):
-    def __init__(self, group, directory, parent, isSelectLevel):
+    def __init__(self, group, directory, parent, isSelectLevel, startPos):
         super().__init__(group)
         self.parent = parent
         # Переменные игрока
-        self.posPlayerX = 20
-        self.posPlayerY = 265
+        self.posPlayerX = startPos[0]  # 20
+        self.posPlayerY = startPos[1]  # 265
         self.speedPlayer = 5
         self.gravity = -12
         self.isJump = False  # Проверка, что игрок прыгает
         self.isGround = True  # Проверка, что игрок на земле
         self.isMove = False  # Проверка, что игрок двигается
         self.isDoor = False  # Проверка, что игрок около двери
+        self.isLock = False  # Блокируем движение игрока
         self.jumpCount = 11
         self.dictInfoPlayer = {}
         # Переменные, которые используются только в сцене выбора уровня
@@ -67,10 +68,12 @@ class ControllerPlayer(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         #  print(self.posPlayerX)
         if keys[pygame.K_d] and self.posPlayerX <= 1210:
-            self.posPlayerX += self.speedPlayer
+            if not self.isLock:
+                self.posPlayerX += self.speedPlayer
             self.isMove = True
         elif keys[pygame.K_a] and self.posPlayerX >= 10:
-            self.posPlayerX -= self.speedPlayer
+            if not self.isLock:
+                self.posPlayerX -= self.speedPlayer
             self.isMove = True
         elif keys[pygame.K_RETURN] and self.isDoor:
             print(self.parent.infoDoorToPlayer)
@@ -78,7 +81,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         else:
             self.isMove = False
         self.rect.x = self.posPlayerX
-        if self.rect.y >= 800:
+        if self.rect.y >= 800 and self.isSelectLevel:
             self.MoveToStart([20, 265])
         if not self.isJump:
             if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrass)[0] is False:

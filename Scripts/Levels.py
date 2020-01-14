@@ -26,7 +26,7 @@ class Levels:
         self.fontLevels = pygame.font.Font("../Fonts/Font01.otf", 80)
         self.fontLevelsDoor = pygame.font.Font("../Fonts/Font01.otf", 15)
         # Группа спрайтов с персонажем и создание персонажа
-        self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, True)
+        self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, True, (20, 265))
         self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/PlanSceneLevel.txt")
 
     def MainFunction(self):
