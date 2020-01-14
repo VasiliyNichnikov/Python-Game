@@ -1,10 +1,9 @@
 import os
 import pygame
-from Scripts.Level_N import Level
 
 
 class ControllerPlayer(pygame.sprite.Sprite):
-    def __init__(self, group, directory, parent):
+    def __init__(self, group, directory, parent, isSelectLevel):
         super().__init__(group)
         self.parent = parent
         # Переменные игрока
@@ -18,7 +17,10 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.isDoor = False  # Проверка, что игрок около двери
         self.jumpCount = 11
         self.dictInfoPlayer = {}
-        # Прыжлк вверх
+        # Переменные, которые используются только в сцене выбора уровня
+        self.isSelectLevel = isSelectLevel
+
+        # Прыжок вверх
         self.jumpUp = pygame.image.load("../data/Person/Jump/Jump_01.png")
         self.jumpUp = pygame.transform.scale(self.jumpUp, (50, 50))
         # Прыжок вниз
@@ -72,7 +74,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
             self.isMove = True
         elif keys[pygame.K_RETURN] and self.isDoor:
             print(self.parent.infoDoorToPlayer)
-            level_N = Level(self)
+            self.parent.LoadLevel()
         else:
             self.isMove = False
         self.rect.x = self.posPlayerX
@@ -95,11 +97,11 @@ class ControllerPlayer(pygame.sprite.Sprite):
                 self.jumpCount = 11
             self.jumpCount -= 1
 
-        if self.Doors(self.parent.dictInfoDoor):
-            self.isDoor = True
-            print("Можно войти")
-        else:
-            self.isDoor = False
+        if self.isSelectLevel:
+            if self.Doors(self.parent.dictInfoDoor):
+                self.isDoor = True
+            else:
+                self.isDoor = False
 
     # Перемещение на старт
     def MoveToStart(self, start):

@@ -2,13 +2,14 @@ import pygame
 from Scripts.ControllerPlayer import ControllerPlayer
 from Scripts.LoadImages import WorkWithImage
 from Scripts.CreateScene import CreateScene
+from Scripts.Level_N import Level
 
 
 class Levels:
     classLoadImage = WorkWithImage()  # Класс для работы с изображением
     # Информация о двери около которой находится игрок
     infoDoorToPlayer = {}
-    spritesTitles = pygame.sprite.Group()
+    #spritesTitles = pygame.sprite.Group()
     playerGroup = pygame.sprite.Group()  # Группа с персонажем
     # Шрифт
     # Цвета шрифта
@@ -25,7 +26,7 @@ class Levels:
         self.fontLevels = pygame.font.Font("../Fonts/Font01.otf", 80)
         self.fontLevelsDoor = pygame.font.Font("../Fonts/Font01.otf", 15)
         # Группа спрайтов с персонажем и создание персонажа
-        self.player = ControllerPlayer(self.playerGroup, "../data/Person", self)
+        self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, True)
         self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/PlanSceneLevel.txt")
 
     def MainFunction(self):
@@ -35,6 +36,7 @@ class Levels:
         screen = pygame.display.set_mode(size)
         # Загружаем спрайты для заднего фона меню
         spritesBackgroundMenuGroup = pygame.sprite.Group()
+
         # Спрайт заднего фона с размером 1280 на 720
         self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Sky.png", (width, height))
         self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_2.png", (width, height), way="../data/Levels",
@@ -52,8 +54,11 @@ class Levels:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+
             # Работа с изображением (Начало)
+            #  screen.fill(pygame.Color('black'))
             spritesBackgroundMenuGroup.draw(screen)
+
             self.classLoadScene.spritesTitles.draw(screen)
             # Работа с изображением (Конец)
 
@@ -64,12 +69,18 @@ class Levels:
                                                                              self.colorLevelDoor)
                 screen.blit(self.dictAllTexts[text]["text"], self.dictAllTexts[text]["position"])
             # Работа с текстом (Конец)
-            self.player.update(self.spritesTitles)
+            # Рисование и движение игрока (Начало)
+            self.player.update(self.classLoadScene.spritesTitles)
             self.playerGroup.draw(screen)
-            # Работа с персонажем (Конец)
-            pygame.display.flip()
+            # Рисование и движение игрока (Конец)
+
+            pygame.display.update()
             clock.tick(FPS)
         pygame.quit()
+
+    # Загрзка уровня
+    def LoadLevel(self):
+        level_N = Level()
 
     # Случайно создает траву на блоке (Не на всех блоках)
     def CreateGrassInBlock(self, posX=0, posY=0):
