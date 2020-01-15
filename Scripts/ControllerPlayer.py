@@ -16,6 +16,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.isMove = False  # Проверка, что игрок двигается
         self.isDoor = False  # Проверка, что игрок около двери
         self.isLock = False  # Блокируем движение игрока
+        self.isDead = False  # Проверка игрока на проигрыш
         self.jumpCount = 11
         self.dictInfoPlayer = {}
         # Переменные, которые используются только в сцене выбора уровня
@@ -83,6 +84,8 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.rect.x = self.posPlayerX
         if self.rect.y >= 800 and self.isSelectLevel:
             self.MoveToStart([20, 265])
+        elif self.rect.y >= 800 and not self.isSelectLevel:
+            self.isDead = True
         if not self.isJump:
             if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrass)[0] is False:
                 self.rect.y -= self.gravity
