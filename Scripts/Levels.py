@@ -3,13 +3,14 @@ from Scripts.ControllerPlayer import ControllerPlayer
 from Scripts.LoadImages import WorkWithImage
 from Scripts.CreateScene import CreateScene
 from Scripts.Level_N import Level
+from Scripts.ControllerText import WorkWithText
 
 
 class Levels:
     classLoadImage = WorkWithImage()  # Класс для работы с изображением
     # Информация о двери около которой находится игрок
     infoDoorToPlayer = {}
-    #spritesTitles = pygame.sprite.Group()
+    # spritesTitles = pygame.sprite.Group()
     playerGroup = pygame.sprite.Group()  # Группа с персонажем
     # Шрифт
     # Цвета шрифта
@@ -37,6 +38,8 @@ class Levels:
         screen = pygame.display.set_mode(size)
         # Загружаем спрайты для заднего фона меню
         spritesBackgroundMenuGroup = pygame.sprite.Group()
+        # Создание текста
+        textSelectLevel = WorkWithText(screen, size, self.colorStandard, "ВЫБОР УРОВНЯ", (0, 250))
 
         # Спрайт заднего фона с размером 1280 на 720
         self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Sky.png", (width, height))
@@ -44,9 +47,6 @@ class Levels:
                                       colorkey=-1)
         self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_1.png", (width, height), way="../data/Levels",
                                       colorkey=-1)
-        # Работа с текстом
-        # Все текста в выборе уровня
-        textLevels = self.fontLevels.render("ВЫБОР УРОВНЯ", 1, self.colorStandard)
 
         FPS = 60
         clock = pygame.time.Clock()
@@ -59,14 +59,14 @@ class Levels:
             if keys[pygame.K_ESCAPE]:
                 self.menuGame.MainProgram()
             # Работа с изображением (Начало)
-            #  screen.fill(pygame.Color('black'))
             spritesBackgroundMenuGroup.draw(screen)
 
             self.classLoadScene.spritesTitles.draw(screen)
             # Работа с изображением (Конец)
 
+            textSelectLevel.RenderText()
+
             # Работа с текстом (Начало)
-            screen.blit(textLevels, (width // 2 - textLevels.get_width() // 2, height // 2 - 350))
             for text in self.dictAllTexts:
                 self.dictAllTexts[text]["text"] = self.fontLevelsDoor.render(self.dictAllTexts[text]["name"], 1,
                                                                              self.colorLevelDoor)
@@ -76,7 +76,6 @@ class Levels:
             self.player.update(self.classLoadScene.spritesTitles)
             self.playerGroup.draw(screen)
             # Рисование и движение игрока (Конец)
-
             pygame.display.update()
             clock.tick(FPS)
         pygame.quit()

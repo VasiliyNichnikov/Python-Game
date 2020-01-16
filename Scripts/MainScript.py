@@ -1,126 +1,94 @@
 import pygame
 from Scripts.Levels import Levels
+from Scripts.ControllerText import WorkWithButtons
 from Scripts.LoadImages import WorkWithImage
 
 
 class MenuScene:
-    # Инициализируем и задаем размеры
-    pygame.init()
-    classLoadImage = WorkWithImage()  # Класс для работы с изображением
-    size = width, height = 1280, 720
-    screen = pygame.display.set_mode(size)
 
-    # Работа с текстом
-    fontMenu = pygame.font.Font("../Fonts/Font01.otf", 80)
+    def __init__(self):
+        # Все цвета кнопок
+        self.colorPress = pygame.Color("#FFB633")
+        self.colorChoice = pygame.Color('#F04643')
+        self.colorStandard = pygame.Color('#E8822E')
 
-    # Все цвета кнопок
-    colorPress = pygame.Color("#FFB633")
-    colorChoice = pygame.Color('#F04643')
-    colorStandard = pygame.Color('#E8822E')
+        # Инициализируем и задаем размеры
+        pygame.init()
+        self.classLoadImage = WorkWithImage()  # Класс для работы с изображением
+        size = width, height = 1280, 720
+        self.screen = pygame.display.set_mode(size)
 
-    # Все текста в меню
-    textPlay = fontMenu.render("ИГРАТЬ", 1, colorStandard)
-    textShop = fontMenu.render("МАГАЗИН", 1, colorStandard)
-    textSettings = fontMenu.render("НАСТРОЙКИ", 1, colorStandard)
-    textExit = fontMenu.render("ВЫХОД", 1, colorStandard)
+        # Программа запущенна
+        self.running = True
 
-    running = True
+        # Загружаем спрайты для заднего фона меню
+        self.spritesBackgroundMenuGroup = pygame.sprite.Group()
+        # Спрайт заднего фона с размером 1280 на 720
+        self.classLoadImage.AddSprite(self.spritesBackgroundMenuGroup, "Background.png", (width, height))
 
-    # Функция вызова кнопок
-    def ButtonMenu(self, nameButton):
-        if nameButton == "ИГРАТЬ":
-            levels = Levels(self)
-            levels.MainFunction()
-        elif nameButton == "МАГАЗИН":
-            print("Shop")
-        elif nameButton == "НАСТРОЙКИ":
-            print("Settings")
-        elif nameButton == "ВЫХОД":
-            self.running = False
+        # Создание кнопок
+        buttonPlay = WorkWithButtons(self.screen, size, self.colorStandard, "ИГРАТЬ", 0,
+                                     colorChoice=self.colorChoice,
+                                     colorPress=self.colorPress, posPlusMinusXY=(0, 0))
+        buttonExit = WorkWithButtons(self.screen, size, self.colorStandard, "ВЫХОД", 1,
+                                     colorChoice=self.colorChoice,
+                                     colorPress=self.colorPress, posPlusMinusXY=(0, -100))
+        self.listAllButtons = [buttonPlay, buttonExit]
+        self.MainProgram()
 
-    listButtonsMenu = {
-        "btnPlay": {"name": "ИГРАТЬ", "num": 1, "btn": textPlay, "active": "select", "position": (width // 2 - textPlay.get_width() // 2, height // 2 - 180)},
-        "btnShop": {"name": "МАГАЗИН", "num": 2, "btn": textShop, "active": "standard", "position": (width // 2 - textShop.get_width() // 2, height // 2 - 100)},
-        "btnSettings": {"name": "НАСТРОЙКИ", "num": 3, "btn": textSettings, "active": "standard", "position": (width // 2 - textSettings.get_width() // 2, height // 2 - 20)},
-        "btnExit": {"name": "ВЫХОД", "num": 4, "btn": textExit, "active": "standard", "position": (width // 2 - textExit.get_width() // 2, height // 2 + 60)}
-    }
+    # Загрузка сцены с уровнями (Play)
+    def LoadSceneLevels(self):
+        sceneLevels = Levels(self)
+        sceneLevels.MainFunction()
 
-    def Reload(self):
-        self.listButtonsMenu = {
-            "btnPlay": {"name": "ИГРАТЬ", "num": 1, "btn": self.textPlay, "active": "select",
-                        "position": (self.width // 2 - self.textPlay.get_width() // 2, self.height // 2 - 180)},
-            "btnShop": {"name": "МАГАЗИН", "num": 2, "btn": self.textShop, "active": "standard",
-                        "position": (self.width // 2 - self.textShop.get_width() // 2, self.height // 2 - 100)},
-            "btnSettings": {"name": "НАСТРОЙКИ", "num": 3, "btn": self.textSettings, "active": "standard",
-                            "position": (self.width // 2 - self.textSettings.get_width() // 2, self.height // 2 - 20)},
-            "btnExit": {"name": "ВЫХОД", "num": 4, "btn": self.textExit, "active": "standard",
-                        "position": (self.width // 2 - self.textExit.get_width() // 2, self.height // 2 + 60)}
-        }
+    def QuitGame(self):
+        self.running = False
 
-    # Загружаем спрайты для заднего фона меню
-    spritesBackgroundMenuGroup = pygame.sprite.Group()
-    # Спрайт заднего фона с размером 1280 на 720
-    classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Background.png", (width, height))
+    # Определяем наимольший, наименьший и id, который сейчас выбран у кнопки
+    def ReturnIdButton(self):
+        idMin = 0
+        idMax = len(self.listAllButtons)
+        idSelected = 0
+        for btn in self.listAllButtons:
+            if btn.condition == "selected":
+                idSelected = btn.id
+        return idMin, idMax, idSelected
 
-    # Меняет цвет кнопки (direction(true) - вверх, direction(false) - вниз)
-    def ChangeButton(self, direction=False):
-        btnNumSelected = None
-        for btn in self.listButtonsMenu:
-            if self.listButtonsMenu[btn]["active"] == "select":
-                btnNumSelected = int(self.listButtonsMenu[btn]["num"])
-        # Двигаем кнопку вверх
-        if direction and btnNumSelected - 1 >= 1:
-            for btn in self.listButtonsMenu:
-                if self.listButtonsMenu[btn]["active"] == "select":
-                    self.listButtonsMenu[btn]["active"] = "standard"
-                elif self.listButtonsMenu[btn]["num"] == btnNumSelected - 1:
-                    self.listButtonsMenu[btn]["active"] = "select"
-        # Двигаем кнопку вниз
-        elif not direction and btnNumSelected + 1 <= 4:
-            for btn in self.listButtonsMenu:
-                if self.listButtonsMenu[btn]["active"] == "select":
-                    self.listButtonsMenu[btn]["active"] = "standard"
-                elif self.listButtonsMenu[btn]["num"] == btnNumSelected + 1:
-                    self.listButtonsMenu[btn]["active"] = "select"
-
+    # Основная программа
     def MainProgram(self):
         FPS = 60
         clock = pygame.time.Clock()
-        self.Reload()
         while self.running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
-                # Проверка нажатий с клавиатуры
-                if event.type == pygame.KEYDOWN:
-                    # Проверка на нажатия стрелок и Enter
-                    if event.key == pygame.K_UP:
-                        print("UP")
-                        self.ChangeButton(True)
-                    elif event.key == pygame.K_DOWN:
-                        print("DOWN")
-                        self.ChangeButton()
-                    elif event.key == pygame.K_RETURN:
-                        print("ENTER")
-                        for btn in self.listButtonsMenu:
-                            if self.listButtonsMenu[btn]["active"] == "select":
-                                self.listButtonsMenu[btn]["active"] = "transition"
-                                print(self.listButtonsMenu[btn]["name"], "происходит действие")
-                                self.ButtonMenu(self.listButtonsMenu[btn]["name"])
+
+            # Проверка нажатий с клавиатуры
+            keys = pygame.key.get_pressed()
+            idMin, idMax, idSelected = self.ReturnIdButton()
+            if keys[pygame.K_UP]:
+                if idSelected - 1 >= idMin:
+                    self.listAllButtons[idSelected].SelectBtn()
+                    self.listAllButtons[idSelected - 1].SelectBtn(True)
+            elif keys[pygame.K_DOWN]:
+                if idSelected + 1 < idMax:
+                    self.listAllButtons[idSelected].SelectBtn()
+                    self.listAllButtons[idSelected + 1].SelectBtn(True)
+            elif keys[pygame.K_RETURN]:
+                title = self.listAllButtons[idSelected].Input()
+                if title == "ИГРАТЬ":
+                    self.LoadSceneLevels()
+                elif title == "ВЫХОД":
+                    self.QuitGame()
+
             # Игровой цикл (Начало)
             self.spritesBackgroundMenuGroup.draw(self.screen)
             # Игровой цикл (Конец)
 
-            # Начало работы с текстом (Вывод текста)
-            for btn in self.listButtonsMenu:
-                if self.listButtonsMenu[btn]["active"] == "select":
-                    self.listButtonsMenu[btn]["btn"] = self.fontMenu.render(self.listButtonsMenu[btn]["name"], 1, self.colorChoice)
-                elif self.listButtonsMenu[btn]["active"] == "standard":
-                    self.listButtonsMenu[btn]["btn"] = self.fontMenu.render(self.listButtonsMenu[btn]["name"], 1, self.colorStandard)
-                elif self.listButtonsMenu[btn]["active"] == "transition":
-                    self.listButtonsMenu[btn]["btn"] = self.fontMenu.render(self.listButtonsMenu[btn]["name"], 1, self.colorPress)
-                self.screen.blit(self.listButtonsMenu[btn]["btn"], self.listButtonsMenu[btn]["position"])
-            # Конец работы с текстом
+            # Рендер кнопок(Начало)
+            for btn in self.listAllButtons:
+                btn.RenderBtn()
+            # Рендер кнопок(Конец)
             pygame.display.flip()
             clock.tick(FPS)
         pygame.quit()
@@ -128,4 +96,3 @@ class MenuScene:
 
 if __name__ == "__main__":
     StartGame = MenuScene()
-    StartGame.MainProgram()

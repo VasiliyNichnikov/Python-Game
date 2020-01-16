@@ -13,6 +13,7 @@ class Level:
     colorPress = pygame.Color("#FFB633")
     colorChoice = pygame.Color('#F04643')
     colorStandard = pygame.Color('#E8822E')
+    isPauseGame = False  # Пауза в игре
 
     def __init__(self, sceneLevels):
         #self.player = player
@@ -58,9 +59,11 @@ class Level:
 
         # Спрайт заднего фона с размером 1280 на 720
         self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Sky.png", (self.width, self.height))
-        self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_2.png", (self.width, self.height), way="../data/Levels",
+        self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_2.png", (self.width, self.height),
+                                      way="../data/Levels",
                                       colorkey=-1)
-        self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_1.png", (self.width, self.height), way="../data/Levels",
+        self.classLoadImage.AddSprite(spritesBackgroundMenuGroup, "Hills_1.png", (self.width, self.height),
+                                      way="../data/Levels",
                                       colorkey=-1)
 
         for sprite in self.classLoadScene.spritesTitles:
@@ -83,6 +86,8 @@ class Level:
                                 self.listButtonsMenu[btn]["active"] = "transition"
                                 print(self.listButtonsMenu[btn]["name"], "происходит действие")
                                 self.ButtonLevel(self.listButtonsMenu[btn]["name"])
+                    elif event.key == pygame.K_ESCAPE:
+                        self.isPauseGame = not self.isPauseGame
 
             #self.camera.update(self.player)
             #if self.player.isMove:
@@ -98,7 +103,7 @@ class Level:
             self.player.update(self.classLoadScene.spritesTitles)
             self.playerGroup.draw(screen)
             # Рисование и движение игрока (Конец)
-            if self.player.isDead:
+            if self.player.isDead or self.isPauseGame:
                 self.DrawText(screen)
             pygame.display.flip()
             clock.tick(FPS)
