@@ -21,6 +21,9 @@ class MenuScene:
         # Программа запущенна
         self.running = True
 
+        # Загрузка сцены с уровнями
+        self.sceneLevels = Levels(self)
+
         # Загружаем спрайты для заднего фона меню
         self.spritesBackgroundMenuGroup = pygame.sprite.Group()
         # Спрайт заднего фона с размером 1280 на 720
@@ -38,8 +41,7 @@ class MenuScene:
 
     # Загрузка сцены с уровнями (Play)
     def LoadSceneLevels(self):
-        sceneLevels = Levels(self)
-        sceneLevels.MainFunction()
+        self.sceneLevels.MainFunction()
 
     def QuitGame(self):
         self.running = False

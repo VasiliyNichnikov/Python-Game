@@ -29,6 +29,7 @@ class Levels:
         # Группа спрайтов с персонажем и создание персонажа
         self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, True, (20, 265))
         self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/PlanSceneLevel.txt")
+        self.level_N = Level(self)
         self.menuGame = menuGame
 
     def MainFunction(self):
@@ -82,12 +83,4 @@ class Levels:
 
     # Загрзка уровня
     def LoadLevel(self):
-        level_N = Level(self)
-
-    # Случайно создает траву на блоке (Не на всех блоках)
-    def CreateGrassInBlock(self, posX=0, posY=0):
-        pass
-    #     listAllGrass = []
-    #     directory = "../data/Grass"
-    #     files = os.listdir(directory)
-    #     print(files)
+        self.level_N.MainFunction()

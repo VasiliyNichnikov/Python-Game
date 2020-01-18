@@ -33,11 +33,11 @@ class WorkWithButtons:
     def SelectBtn(self, active=False):
         if active:
             self.btnColor = self.colorChoice
-            self.sizeFont = 100
+            self.sizeFont += 10
             self.condition = "selected"
         else:
             self.btnColor = self.colorStandard
-            self.sizeFont = 80
+            self.sizeFont -= 10
             self.condition = "standard"
 
     def RenderBtn(self):

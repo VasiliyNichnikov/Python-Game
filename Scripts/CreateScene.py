@@ -10,7 +10,8 @@ class CreateScene:
         self.sizeTitle = sizeTitle
         self.player = player
         self.directory = directory
-        self.listAllSpritesGrass = []
+        self.listAllSpritesGrassX = []
+        self.listAllSpritesGrassY = []
         self.LoadScene()
 
     # Загрузка уровня с помощью текстового документа
@@ -25,7 +26,7 @@ class CreateScene:
                         self.classLoadImage.AddSprite(self.spritesTitles, "GrassMid.png",
                                                       (self.sizeTitle, self.sizeTitle), way="../data/Levels",
                                                       position=(numX, numY))
-                        self.listAllSpritesGrass.append(self.spritesTitles.sprites()[-1])
+                        self.listAllSpritesGrassY.append(self.spritesTitles.sprites()[-1])
                     elif line[block] == '#':  # Просто земля
                         self.classLoadImage.AddSprite(self.spritesTitles, "Dirt.png", (self.sizeTitle, self.sizeTitle),
                                                       way="../data/Levels", position=(numX, numY))
@@ -44,11 +45,12 @@ class CreateScene:
                                                       (self.sizeTitle, self.sizeTitle), way="../data/Levels",
                                                       position=(numX, numY))
                         #self.parent.CreateGrassInBlock()
-                        self.listAllSpritesGrass.append(self.spritesTitles.sprites()[-1])
+                        self.listAllSpritesGrassY.append(self.spritesTitles.sprites()[-1])
                     elif line[block] == '.':  # Земля с права
                         self.classLoadImage.AddSprite(self.spritesTitles, "DirtRight.png",
                                                       (self.sizeTitle, self.sizeTitle), way="../data/Levels",
                                                       position=(numX, numY))
+                        self.listAllSpritesGrassX.append(self.spritesTitles.sprites()[-1])
                     elif line[block] == ',':  # Земля с лева
                         self.classLoadImage.AddSprite(self.spritesTitles, "DirtLeft.png",
                                                       (self.sizeTitle, self.sizeTitle), way="../data/Levels",
@@ -57,12 +59,14 @@ class CreateScene:
                         self.classLoadImage.AddSprite(self.spritesTitles, "GrassRight.png",
                                                       (self.sizeTitle, self.sizeTitle), way="../data/Levels",
                                                       position=(numX, numY))
-                        self.listAllSpritesGrass.append(self.spritesTitles.sprites()[-1])
+                        self.listAllSpritesGrassX.append(self.spritesTitles.sprites()[-1])
+                        self.listAllSpritesGrassY.append(self.spritesTitles.sprites()[-1])
                     elif line[block] == '!':  # Трава с лева
                         self.classLoadImage.AddSprite(self.spritesTitles, "GrassLeft.png",
                                                       (self.sizeTitle, self.sizeTitle), way="../data/Levels",
                                                       position=(numX, numY))
-                        self.listAllSpritesGrass.append(self.spritesTitles.sprites()[-1])
+                        self.listAllSpritesGrassX.append(self.spritesTitles.sprites()[-1])
+                        self.listAllSpritesGrassY.append(self.spritesTitles.sprites()[-1])
                     elif line[block] == '^':  # Дверь с уровнями (Доделать)
                         self.classLoadImage.AddSprite(self.spritesTitles, "Door.png", (self.sizeTitle, self.sizeTitle),
                                                       way="../data/Levels",

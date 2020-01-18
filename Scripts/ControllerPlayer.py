@@ -17,6 +17,8 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.isDoor = False  # Проверка, что игрок около двери
         self.isLock = False  # Блокируем движение игрока
         self.isDead = False  # Проверка игрока на проигрыш
+        self.isMoveRight = True  # Можно двигаться в право
+        self.isMoveLeft = True  # Можно двигаться в лево
         self.jumpCount = 11
         self.dictInfoPlayer = {}
         # Переменные, которые используются только в сцене выбора уровня
@@ -42,7 +44,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         listRes = []
         for image in files:
             loadedImage = pygame.image.load(directory + "/" + nameFolder + "/" + image)
-            loadedImage = pygame.transform.scale(loadedImage, (50, 50))
+            loadedImage = pygame.transform.scale(loadedImage, (60, 60))
             self.rect = loadedImage.get_rect()
             listRes.append(loadedImage)
             #  self.frames.append(loadedImage)
@@ -68,11 +70,14 @@ class ControllerPlayer(pygame.sprite.Sprite):
         # Проверка нажатий на кнопки
         keys = pygame.key.get_pressed()
         #  print(self.posPlayerX)
-        if keys[pygame.K_d] and self.posPlayerX <= 1210:
+        #  print(self.CheckPosX(self.parent.classLoadScene.listAllSpritesGrassX))
+        self.CheckPosX(self.parent.classLoadScene.listAllSpritesGrassX)
+        #  print(self.isMoveRight, self.isMoveLeft, self.isMove)
+        if keys[pygame.K_d] and self.posPlayerX <= 1210 and self.isMoveRight:
             if not self.isLock:
                 self.posPlayerX += self.speedPlayer
             self.isMove = True
-        elif keys[pygame.K_a] and self.posPlayerX >= 10:
+        elif keys[pygame.K_a] and self.posPlayerX >= 10 and self.isMoveLeft:
             if not self.isLock:
                 self.posPlayerX -= self.speedPlayer
             self.isMove = True
@@ -87,7 +92,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         elif self.rect.y >= 800 and not self.isSelectLevel:
             self.isDead = True
         if not self.isJump:
-            if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrass)[0] is False:
+            if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrassY)[0] is False:
                 self.rect.y -= self.gravity
             else:
                 self.isGround = True
@@ -115,6 +120,29 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.rect.y = start[1]
         self.posPlayerX = start[0]
         self.posPlayerY = start[1]
+
+    def CheckPosX(self, allBlocks):
+        check = False
+        blocksZone = pygame.sprite.spritecollide(self, allBlocks, False)
+        for blockOne in blocksZone:
+            for blockTwo in allBlocks:
+                if blockTwo == blockOne and self.rect.y >= blockTwo.rect.y:
+                    check = True
+                    if self.rect.x > blockTwo.rect.x:
+                        #  print("Right OK")
+                        self.isMoveRight = True
+                        self.isMoveLeft = False
+                    else:
+                        #  print("Left OK")
+                        self.isMoveRight = False
+                        self.isMoveLeft = True
+        if not check:
+            self.isMoveRight = True
+            self.isMoveLeft = True
+            #  print(self.rect.x, blockTwo.rect.x)
+            #  print(str(self.rect.y) + " Player", str(blockTwo.rect.y) + " Block")
+            #  return True  # , blockTwo.rect.y
+        #  return False  # , 0
 
     # Проверяем, если под игроком блоки
     def CheckGravity(self, allBlocks):
