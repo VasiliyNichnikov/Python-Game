@@ -20,6 +20,10 @@ class Level:
     def __init__(self, sceneLevels):
         # Инициализируем и задаем размеры
         pygame.init()
+
+        # Загрузки звуков
+        self.soundButtonInput = pygame.mixer.Sound('../Sounds/inputButton.mp3')
+
         size = self.width, self.height
         self.screen = pygame.display.set_mode(size)
         self.sceneLevels = sceneLevels
@@ -31,12 +35,21 @@ class Level:
                                              colorChoice=self.colorChoice,
                                              colorPress=self.colorPress, posPlusMinusXY=(0, 100))
         self.listAllButtons = [buttonReturnLevels]
-        self.textNameMenu = WorkWithText(self.screen, size, self.colorPress, "ПАУЗА", (0, 200))
+        self.textPauseMenu = WorkWithText(self.screen, size, self.colorPress, "ПАУЗА", (0, 200))
+        self.textGameOverMenu = WorkWithText(self.screen, size, self.colorStandard, "ПОРАЖЕНИЕ", (0, 200))
         for sprite in self.classLoadScene.spritesTitles:
-            self.camera.StartPos(sprite, self.player, 1000, self.width // 2)
+            self.camera.StartPos(sprite, self.player, 600, self.width // 2)
+        for sprite in self.classLoadScene.spritesBots:
+            self.camera.StartPos(sprite, self.player, 600, self.width // 2)
+        for sprite in self.classLoadScene.spritesThings:
+            self.camera.StartPos(sprite, self.player, 600, self.width // 2)
 
     # Загрузка сцены с уровнями (Play)
-    def LoadSceneLevels(self):
+    def LoadSceneLevels(self, levelEnd=False):
+        if levelEnd:
+            self.player.dictInfoPlayer['Level'] = int(self.player.dictInfoPlayer['Level']) + 1
+            self.player.dictInfoPlayer['Last_Open_Level'] = int(self.player.dictInfoPlayer['Last_Open_Level']) + 1
+            print(self.player.dictInfoPlayer)
         self.sceneLevels.MainFunction()
 
     # Определяем наимольший, наименьший и id, который сейчас выбран у кнопки
@@ -54,6 +67,7 @@ class Level:
         self.player.MoveToStart((1280 // 2, 265))
         self.isPauseGame = False
         self.player.isDead = False
+        self.player.isBlockGravity = True
         # Загружаем спрайты для заднего фона меню
         spritesBackgroundMenuGroup = pygame.sprite.Group()
 
@@ -68,13 +82,20 @@ class Level:
         FPS = 60
         clock = pygame.time.Clock()
         running = True
+        levelEnd = False
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 if event.type == pygame.KEYDOWN:
+                    idMin, idMax, idSelected = self.ReturnIdButton()
                     if event.key == pygame.K_ESCAPE:
                         self.isPauseGame = not self.isPauseGame
+                    if event.key == pygame.K_RETURN and (self.isPauseGame or self.player.isDead or levelEnd):
+                        self.soundButtonInput.play()
+                        title = self.listAllButtons[idSelected].Input()
+                        if title == "ВЫХОД В ВЫБОР УРОВНЯ" or levelEnd:
+                            self.LoadSceneLevels(levelEnd)
             keys = pygame.key.get_pressed()
             idMin, idMax, idSelected = self.ReturnIdButton()
             if keys[pygame.K_UP]:
@@ -85,18 +106,30 @@ class Level:
                 if idSelected + 1 < idMax:
                     self.listAllButtons[idSelected].SelectBtn()
                     self.listAllButtons[idSelected + 1].SelectBtn(True)
-            elif keys[pygame.K_RETURN] and (self.isPauseGame or self.player.isDead):
-                title = self.listAllButtons[idSelected].Input()
-                if title == "ВЫХОД В ВЫБОР УРОВНЯ":
-                    self.LoadSceneLevels()
+            levelEnd = self.player.EndLevel(self.classLoadScene.doorEndLevel)
 
             if not self.player.isDead and not self.isPauseGame:
                 for sprite in self.classLoadScene.spritesTitles:
                     self.camera.apply(sprite)
+                for sprite in self.classLoadScene.spritesBots:
+                    self.camera.apply(sprite)
+                for sprite in self.classLoadScene.spritesThings:
+                    self.camera.apply(sprite)
             # Рисование Titles (Начало)
             spritesBackgroundMenuGroup.draw(self.screen)
+            for thing in self.classLoadScene.listAllThings:
+                thing.Update(self.screen)
+                thing.CheckPlayer(self.playerGroup, self.player)
             self.classLoadScene.spritesTitles.draw(self.screen)
+            self.classLoadScene.spritesBots.draw(self.screen)
             # Рисование Titles (Конец)
+
+            # Работа ботов (Начало)
+            #  print(self.classLoadScene.spritesBots)
+            for bot in self.classLoadScene.listAllBots:
+                bot.update(self.classLoadScene.spritesBots)
+                bot.CheckPlayer(self.playerGroup, self.player)
+            # Работа ботов (Конец)
 
             # Рисование и движение игрока (Начало)
             self.player.update(self.classLoadScene.spritesTitles)
@@ -105,7 +138,10 @@ class Level:
             if self.player.isDead or self.isPauseGame:
                 for btn in self.listAllButtons:
                     btn.RenderBtn()
-                self.textNameMenu.RenderText()
+                if not self.player.isDead:
+                    self.textPauseMenu.RenderText()
+                else:
+                    self.textGameOverMenu.RenderText()
             pygame.display.flip()
             clock.tick(FPS)
         pygame.quit()

@@ -56,9 +56,11 @@ class Levels:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_ESCAPE]:
-                self.menuGame.MainProgram()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.menuGame.MainProgram()
+                    if event.key == pygame.K_RETURN and self.player.isDoor:
+                        self.LoadLevel()
             # Работа с изображением (Начало)
             spritesBackgroundMenuGroup.draw(screen)
 

@@ -19,6 +19,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.isDead = False  # Проверка игрока на проигрыш
         self.isMoveRight = True  # Можно двигаться в право
         self.isMoveLeft = True  # Можно двигаться в лево
+        self.isBlockGravity = True  # Блокировка гравитации
         self.jumpCount = 11
         self.dictInfoPlayer = {}
         # Переменные, которые используются только в сцене выбора уровня
@@ -69,8 +70,6 @@ class ControllerPlayer(pygame.sprite.Sprite):
     def MovePlayer(self):
         # Проверка нажатий на кнопки
         keys = pygame.key.get_pressed()
-        #  print(self.posPlayerX)
-        #  print(self.CheckPosX(self.parent.classLoadScene.listAllSpritesGrassX))
         self.CheckPosX(self.parent.classLoadScene.listAllSpritesGrassX)
         #  print(self.isMoveRight, self.isMoveLeft, self.isMove)
         if keys[pygame.K_d] and self.posPlayerX <= 1210 and self.isMoveRight:
@@ -81,18 +80,16 @@ class ControllerPlayer(pygame.sprite.Sprite):
             if not self.isLock:
                 self.posPlayerX -= self.speedPlayer
             self.isMove = True
-        elif keys[pygame.K_RETURN] and self.isDoor:
-            print(self.parent.infoDoorToPlayer)
-            self.parent.LoadLevel()
         else:
             self.isMove = False
         self.rect.x = self.posPlayerX
+
         if self.rect.y >= 800 and self.isSelectLevel:
             self.MoveToStart([20, 265])
         elif self.rect.y >= 800 and not self.isSelectLevel:
             self.isDead = True
         if not self.isJump:
-            if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrassY)[0] is False:
+            if self.CheckGravity(self.parent.classLoadScene.listAllSpritesGrassY)[0] is False or not self.isBlockGravity:
                 self.rect.y -= self.gravity
             else:
                 self.isGround = True
@@ -165,6 +162,16 @@ class ControllerPlayer(pygame.sprite.Sprite):
             for blockTwo in listBlocks:
                 if blockTwo == blockOne and int(self.CheckLevel(blockTwo, allBlocksDoors)) <= \
                         int(self.dictInfoPlayer["Level"]):
+                    return True
+        return False
+
+    # Метод для выхода с уровня
+    def EndLevel(self, doorEndGame):
+        listDoors = [doorEndGame]
+        blocksZone = pygame.sprite.spritecollide(self, listDoors, False)
+        for blockOne in blocksZone:
+            for blockTwo in listDoors:
+                if blockOne == blockTwo:
                     return True
         return False
 
