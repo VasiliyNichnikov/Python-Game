@@ -29,8 +29,14 @@ class Levels:
         # Группа спрайтов с персонажем и создание персонажа
         self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, True, (20, 265))
         self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/PlanSceneLevel.txt")
-        self.level_N = Level(self)
+        self.level_N = None
         self.menuGame = menuGame
+
+    def ReloadMap(self):
+        for i in self.classLoadScene.spritesTitles:
+            self.classLoadScene.spritesTitles.remove(i)
+        self.player.InformationPlayer()
+        self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/PlanSceneLevel.txt")
 
     def MainFunction(self):
         # Инициализируем и задаем размеры
@@ -60,7 +66,7 @@ class Levels:
                     if event.key == pygame.K_ESCAPE:
                         self.menuGame.MainProgram()
                     if event.key == pygame.K_RETURN and self.player.isDoor:
-                        self.LoadLevel()
+                        self.LoadLevel(self.player.numDoor)
             # Работа с изображением (Начало)
             spritesBackgroundMenuGroup.draw(screen)
 
@@ -83,6 +89,11 @@ class Levels:
             clock.tick(FPS)
         pygame.quit()
 
-    # Загрзка уровня
-    def LoadLevel(self):
+    # Загрузка уровня
+    def LoadLevel(self, numberDoor):
+        print(numberDoor)
+        dictionary = f'../Scene_plans/Levels/Level_{numberDoor}.txt'
+        if self.level_N is not None:
+            self.level_N.Reload()
+        self.level_N = Level(self, dictionary)
         self.level_N.MainFunction()

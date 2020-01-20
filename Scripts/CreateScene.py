@@ -81,7 +81,7 @@ class CreateScene:
                                                       position=(numX, numY), colorkey=-1)
                         self.parent.dictInfoDoor["Door" + str(numberDoorLevel)] = {"level": numberDoorLevel,
                                                                                    "sprite": self.spritesTitles.sprites()[-1]}
-                        if int(self.player.dictInfoPlayer['Level']) < numberDoorLevel:  # Уровень подходит
+                        if int(self.player.dictInfoPlayer['Level']) < numberDoorLevel:  # Уровень не подходит
                             self.classLoadImage.AddSprite(self.spritesTitles, "Fence.png",
                                                           (300, 300),
                                                           way="../data/Levels",
@@ -90,8 +90,14 @@ class CreateScene:
                                                           (self.sizeTitle, self.sizeTitle),
                                                           way="../data/Levels",
                                                           position=(numX, numY - 64), colorkey=-1)
-                        else:
+                        elif int(self.player.dictInfoPlayer['Level']) == numberDoorLevel:
                             self.classLoadImage.AddSprite(self.spritesTitles, "OpenLevel.png",
+                                                          (self.sizeTitle, self.sizeTitle),
+                                                          way="../data/Levels",
+                                                          position=(numX, numY - 64), colorkey=-1)
+
+                        else:
+                            self.classLoadImage.AddSprite(self.spritesTitles, "TraversedLevel.png",
                                                           (self.sizeTitle, self.sizeTitle),
                                                           way="../data/Levels",
                                                           position=(numX, numY - 64), colorkey=-1)

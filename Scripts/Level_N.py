@@ -17,7 +17,7 @@ class Level:
     colorStandard = pygame.Color('#E8822E')
     isPauseGame = False  # Пауза в игре
 
-    def __init__(self, sceneLevels):
+    def __init__(self, sceneLevels, directory):
         # Инициализируем и задаем размеры
         pygame.init()
 
@@ -28,7 +28,7 @@ class Level:
         self.screen = pygame.display.set_mode(size)
         self.sceneLevels = sceneLevels
         self.player = ControllerPlayer(self.playerGroup, "../data/Person", self, False, (1280 // 2, 265))
-        self.classLoadScene = CreateScene(self, 85, self.player, "../Scene_plans/Levels/Level_1.txt")
+        self.classLoadScene = CreateScene(self, 85, self.player, directory)
         self.camera = Camera(self.player)
         buttonReturnLevels = WorkWithButtons(self.screen, size, self.colorStandard, "ВЫХОД В ВЫБОР УРОВНЯ", 0,
                                              sizeFont=40,
@@ -44,12 +44,25 @@ class Level:
         for sprite in self.classLoadScene.spritesThings:
             self.camera.StartPos(sprite, self.player, 600, self.width // 2)
 
+    def Reload(self):
+        for i in self.classLoadScene.spritesTitles:
+            self.classLoadScene.spritesTitles.remove(i)
+        for i in self.playerGroup:
+            self.playerGroup.remove(i)
+
     # Загрузка сцены с уровнями (Play)
     def LoadSceneLevels(self, levelEnd=False):
         if levelEnd:
-            self.player.dictInfoPlayer['Level'] = int(self.player.dictInfoPlayer['Level']) + 1
-            self.player.dictInfoPlayer['Last_Open_Level'] = int(self.player.dictInfoPlayer['Last_Open_Level']) + 1
-            print(self.player.dictInfoPlayer)
+            with open("../Scene_plans/Player_Information.txt") as file:
+                fileRead = file.readlines()
+            with open("../Scene_plans/Player_Information.txt", 'w') as file:
+                for info in fileRead:
+                    if info.split() and info.split()[0] == 'Level':
+                        file.write(info.split()[0] + " " + str(int(self.player.dictInfoPlayer['Level']) + 1))
+                        file.write('\n')
+                    elif info.split() and info.split()[0] == 'Money':
+                        file.write(info.split()[0] + " 0")
+            self.sceneLevels.ReloadMap()
         self.sceneLevels.MainFunction()
 
     # Определяем наимольший, наименьший и id, который сейчас выбран у кнопки

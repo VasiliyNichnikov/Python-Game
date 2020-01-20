@@ -19,21 +19,19 @@ class ControllerPlayer(pygame.sprite.Sprite):
         self.isDead = False  # Проверка игрока на проигрыш
         self.isMoveRight = True  # Можно двигаться в право
         self.isMoveLeft = True  # Можно двигаться в лево
+        self.moveRight = False  # Игрок двигается в право
+        self.moveLeft = False  # Игрок двигается в лево
         self.isBlockGravity = True  # Блокировка гравитации
+        self.numDoor = 0  # Дверь около которой стоит игрок
         self.jumpCount = 11
         self.dictInfoPlayer = {}
         # Переменные, которые используются только в сцене выбора уровня
         self.isSelectLevel = isSelectLevel
 
-        # Прыжок вверх
-        self.jumpUp = pygame.image.load("../data/Person/Jump/Jump_01.png")
-        self.jumpUp = pygame.transform.scale(self.jumpUp, (50, 50))
-        # Прыжок вниз
-        self.jumpDown = pygame.image.load("../data/Person/Jump/Jump_02.png")
-        self.jumpDown = pygame.transform.scale(self.jumpDown, (50, 50))
         # Переменные для анимации
-        self.idlePlayer = self.load_images(directory, "Idle")
-        self.movePlayer = self.load_images(directory, "Run")
+        self.idlePlayer = self.load_images(directory, "Idle New")
+        self.runPlayerRight = self.load_images(directory, "Run Right")
+        self.runPlayerLeft = self.load_images(directory, "Run Left")
         self.cur_frame = 0
         self.image = self.idlePlayer[self.cur_frame]
         self.rect = self.rect.move(self.posPlayerX, self.posPlayerY)
@@ -55,14 +53,13 @@ class ControllerPlayer(pygame.sprite.Sprite):
     def update(self, group):
         if self.cur_frame + 1 >= 60:
             self.cur_frame = 0
-        if not self.isJump and self.isGround and self.isMove:
-            self.image = self.movePlayer[self.cur_frame // 4]
-        elif self.isJump:
-            self.image = self.jumpUp
-        elif not self.isGround and not self.isJump:
-            self.image = self.jumpDown
+        if self.isMove:
+            if self.moveRight:
+                self.image = self.runPlayerRight[self.cur_frame // 10]
+            elif self.moveLeft:
+                self.image = self.runPlayerLeft[self.cur_frame // 10]
         else:
-            self.image = self.idlePlayer[self.cur_frame // 6]
+            self.image = self.idlePlayer[0]
         self.cur_frame += 1
         self.MovePlayer()
 
@@ -75,10 +72,14 @@ class ControllerPlayer(pygame.sprite.Sprite):
         if keys[pygame.K_d] and self.posPlayerX <= 1210 and self.isMoveRight:
             if not self.isLock:
                 self.posPlayerX += self.speedPlayer
+            self.moveRight = True
+            self.moveLeft = False
             self.isMove = True
         elif keys[pygame.K_a] and self.posPlayerX >= 10 and self.isMoveLeft:
             if not self.isLock:
                 self.posPlayerX -= self.speedPlayer
+            self.moveRight = False
+            self.moveLeft = True
             self.isMove = True
         else:
             self.isMove = False
@@ -106,10 +107,7 @@ class ControllerPlayer(pygame.sprite.Sprite):
             self.jumpCount -= 1
 
         if self.isSelectLevel:
-            if self.Doors(self.parent.dictInfoDoor):
-                self.isDoor = True
-            else:
-                self.isDoor = False
+            self.isDoor, self.numDoor = self.Doors(self.parent.dictInfoDoor)
 
     # Перемещение на старт
     def MoveToStart(self, start):
@@ -162,8 +160,8 @@ class ControllerPlayer(pygame.sprite.Sprite):
             for blockTwo in listBlocks:
                 if blockTwo == blockOne and int(self.CheckLevel(blockTwo, allBlocksDoors)) <= \
                         int(self.dictInfoPlayer["Level"]):
-                    return True
-        return False
+                    return True, int(self.CheckLevel(blockTwo, allBlocksDoors))
+        return False, 0
 
     # Метод для выхода с уровня
     def EndLevel(self, doorEndGame):
@@ -190,7 +188,3 @@ class ControllerPlayer(pygame.sprite.Sprite):
             for info in fileInformationRead:
                 if info.split():
                     self.dictInfoPlayer[info.split()[0]] = info.split()[-1]
-
-    # Рисование помощи
-    def DrawDoor(self):
-        pass

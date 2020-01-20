@@ -2,10 +2,10 @@ import pygame
 from Scripts.Levels import Levels
 from Scripts.ControllerText import WorkWithButtons
 from Scripts.LoadImages import WorkWithImage
+from Scripts.ControllerText import WorkWithText
 
 
 class MenuScene:
-
     def __init__(self):
         # Все цвета кнопок
         self.colorPress = pygame.Color("#FFB633")
@@ -36,6 +36,9 @@ class MenuScene:
         self.spritesBackgroundMenuGroup = pygame.sprite.Group()
         # Спрайт заднего фона с размером 1280 на 720
         self.classLoadImage.AddSprite(self.spritesBackgroundMenuGroup, "Background.png", (width, height))
+
+        # Текст с названием игры
+        self.textNameGame = WorkWithText(self.screen, size, self.colorPress, "ПЛАТФОРМЕР", (0, 200), sizeFont=100)
 
         # Создание кнопок
         buttonPlay = WorkWithButtons(self.screen, size, self.colorStandard, "ИГРАТЬ", 0,
@@ -95,6 +98,9 @@ class MenuScene:
             # Игровой цикл (Начало)
             self.spritesBackgroundMenuGroup.draw(self.screen)
             # Игровой цикл (Конец)
+
+            # Рендер текста
+            self.textNameGame.RenderText()
 
             # Рендер кнопок(Начало)
             for btn in self.listAllButtons:
