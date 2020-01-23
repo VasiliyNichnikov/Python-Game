@@ -17,7 +17,7 @@ class MenuScene:
         pygame.mixer.music.play(loops=-1)
 
         # Загрузка звуков
-        self.soundButtonInput = pygame.mixer.Sound('../Sounds/inputButton.mp3')
+       # self.soundButtonInput = pygame.mixer.Sound('../Sounds/inputButton.mp3')
 
         self.classLoadImage = WorkWithImage()  # Класс для работы с изображением
         size = width, height = 1280, 720
@@ -85,7 +85,7 @@ class MenuScene:
                     self.listAllButtons[idSelected].SelectBtn()
                     self.listAllButtons[idSelected + 1].SelectBtn(True)
             elif keys[pygame.K_RETURN]:
-                self.soundButtonInput.play()
+#                self.soundButtonInput.play()
                 title = self.listAllButtons[idSelected].Input()
                 if title == "ИГРАТЬ":
                     self.LoadSceneLevels()
